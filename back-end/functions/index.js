@@ -1,4 +1,3 @@
-require("dotenv").config();
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 
@@ -25,6 +24,7 @@ app.use(cors());
 app.get("/", (req, res) => {
   return res.status(200).json({ msg: "API connected" });
 });
+
 app.post("/create", async (req, res) => {
   const accessCode = Math.floor(100000 + Math.random() * 900000); // generate a random 6-digit code
   try {
@@ -35,9 +35,9 @@ app.post("/create", async (req, res) => {
       from: fromPhoneNum,
     });
     await db.collection("phone").doc(toPhoneNumber).set({ accessCode });
-    return res.status(200).json({ msg: "SMS sent!!!" });
+    return res.status(200).json({ msg: "SMS sent to your phone!!!" });
   } catch (error) {
-    return res.status(500).json({ msg: "Server Error!!!" });
+    return res.status(500).json({ msg: "Please try again!!!" });
   }
 });
 
@@ -49,7 +49,7 @@ app.post("/validate", async (req, res) => {
     const currentCode = doc.data().accessCode;
     if (accessCode === currentCode.toString()) {
       await ref.delete();
-      return res.status(200).json({ msg: "Congrazt!!!" });
+      return res.status(200).json({ msg: "Congratulations!!!" });
     } else {
       return res.status(400).json({ msg: "Incorrect access code!!!" });
     }
@@ -59,6 +59,3 @@ app.post("/validate", async (req, res) => {
 });
 
 exports.api = functions.https.onRequest(app);
-// app.listen(3000, () => {
-//   console.log("Server running on port 3000");
-// });
